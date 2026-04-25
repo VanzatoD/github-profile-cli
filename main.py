@@ -1,12 +1,11 @@
 import requests
 import json
-# import os
+import os
 
 login = input("GitHub user: ")
 
 url = f"https://api.github.com/users/{login}"
 res = requests.get(url)
-print(res)
 
 if res.status_code == 200:
     data = res.json()
@@ -41,7 +40,8 @@ if res.status_code == 200:
         output["repos"].append(repo_data)
 
 # saving output_{login}.json:
-    filename = f"output_{login}.json"
+    os.makedirs('outputs', exist_ok=True)
+    filename = os.path.join('outputs', f'output_{login}.json')
 
     with open(filename, "w") as f:
         json.dump(output, f, indent=4)
