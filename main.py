@@ -4,10 +4,26 @@ import os
 
 login = input("GitHub user: ")
 
-url = f"https://api.github.com/users/{login}"
-res = requests.get(url)
 
-if res.status_code == 200:
+os.makedirs('outputs', exist_ok=True)
+filename = os.path.join('outputs', f'output_{login}.json')
+
+if os.path.exists(filename):
+    #debug
+    print(f"\nloading local memory...")
+    with open(filename, "r") as f:
+        output = json.load(f)
+else:
+     #debug
+    print(f"\nloading github api...")
+
+    url = f"https://api.github.com/users/{login}"
+    res = requests.get(url)
+
+    if res.status_code != 200:
+        print("User not found.")
+        exit()
+
     data = res.json()
     output = {
         "profile": {
@@ -25,7 +41,7 @@ if res.status_code == 200:
     }
 
     repos_res = requests.get(data["repos_url"])
-    
+
     if repos_res.status_code == 200:
         repos = repos_res.json()
     else:
@@ -39,25 +55,19 @@ if res.status_code == 200:
         }
         output["repos"].append(repo_data)
 
-# saving output_{login}.json:
-    os.makedirs('outputs', exist_ok=True)
-    filename = os.path.join('outputs', f'output_{login}.json')
-
+    # saving output_{login}.json:
     with open(filename, "w") as f:
         json.dump(output, f, indent=4)
 
 # printing results:
-    print("\n === PROFILE ===")
-    for key, value in output["profile"].items():
+print("\n === PROFILE ===")
+for key, value in output["profile"].items():
+    print(f"{key}: {value}")
+
+print("\n === REPOSITORIES ===")
+for repo in output["repos"]:
+    for key, value in repo.items():
         print(f"{key}: {value}")
+    print("---")
 
-    print("\n === REPOSITORIES ===")
-    for repo in output["repos"]:
-        for key, value in repo.items():
-            print(f"{key}: {value}")
-        print("---")
-
-    print(f"\nSaved to {filename}")
-
-else:
-    print("User not found.")
+print(f"\nSaved/loaded from {filename}")
