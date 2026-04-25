@@ -28,7 +28,7 @@ Then enter a GitHub username when prompted.
 
 ## Planned Features
 
-* [U+2713] Export data to JSON files
+* [x] Export data to JSON files
 * [ ] Turn into a proper CLI tool
 * [ ] Add search history
 * [ ] Improve error handling
